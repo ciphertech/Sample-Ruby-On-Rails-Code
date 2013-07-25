@@ -1,0 +1,13 @@
+<%= form_tag admin_vendor_vendor_inventory_index_path, :id => "search", :class => "search", :method => "get" do %>
+  <fieldset>
+    <input name="utf8" type="hidden" value="✓">
+    <input type="text" name="searchbar" id="searchbar" value="<%= params[:searchbar] %>" placeholder="Inventory Search" class="span4" />
+    <input name="commit" type="button" value="Search" id="searchbtn" /> 
+    &nbsp;<%= link_to "Clear Search", admin_vendor_vendor_inventory_index_path, :class => "btn btn-small" %>
+  </fieldset>
+<% end %>
+<script>
+  $('#searchbtn').bind('click', function() {
+    $("#search").submit();
+  });
+</script>

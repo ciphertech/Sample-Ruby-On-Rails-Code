@@ -1,0 +1,49 @@
+<div class="header_bar">
+  <h2><%= @vendor.name %> Inventory</h2>
+</div>
+<div class="control_bar" style="margin-bottom:0"> 
+  <%= render :partial => "manager/inventories/add_product_field" %>
+  <br/>
+  <%= will_paginate @items, :window => 2, :inner_window => 2 %>
+  <div class="clearboth"></div>
+  <%= link_to "Import Inventory Data", new_admin_vendor_import_inventory_path(@vendor), :class => "btn" %>
+</div>
+
+
+<div class="main_content" id="vendor_inventory" data-url="<%= admin_vendor_vendor_inventory_index_path(@vendor, :format => :json) %>" data-id="<%= @vendor.id %>">
+  <%= render :partial => 'inventory_search' %>
+  <%= render :partial => "items_table" %>
+  <%- if @items.size == 0 && !params[:searchbar].present? %>
+    <div id="copy-vendor-inventory" style="min-height: 500px;">
+      <%= form_tag copy_inventory_admin_vendor_vendor_inventory_index_path do %>
+        <p>Copy inventory from:</p>
+        <p><%= select_tag "vendor", options_from_collection_for_select(Vendor.where("id <> ? and type is null", @vendor.id).order("name"), "id", "name"), :include_blank => true %></p>
+        <p><%= submit_tag "Copy Vendor Inventory Items" %></p>
+      <% end %>
+    </div>
+  <%- end %>
+</div>
+
+<div style="display:none;">
+<table>
+  <tr id="edit_row_form">
+    <td id="item_name"></td>
+    <td><%= select_tag :category, options_from_collection_for_select(Category.all, "id", "name"), :include_blank => true, :class => "narrow" %></td>
+    <td><%= select_tag :unit, options_from_collection_for_select(Unit.all, "id", "name"), :include_blank => true, :class => "narrow" %></td>
+    <td>
+      <%= text_field_tag :price, nil, :class => "narrow" %>
+      <%= hidden_field_tag :item_id %>
+    </td>
+    <td><%= submit_tag "Save", :id => "edit_row_submit" %> <%= link_to "cancel", "#", :class => "cancel" %></td>
+  </tr>
+</table>
+</div>
+
+
+
+<script type="text/javascript">
+
+  var units_for_editor = '<%= units_for_select.to_json.html_safe %>'
+  var categories_for_editor = '<%= categories_for_select.to_json.html_safe %>'
+  
+</script>

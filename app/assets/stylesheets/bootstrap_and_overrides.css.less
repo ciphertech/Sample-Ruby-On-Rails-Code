@@ -1,0 +1,53 @@
+@import "twitter/bootstrap/bootstrap";
+/* @import "twitter/bootstrap/responsive"; */
+
+@baseFontFamily: 'proxima-reg';
+
+body {
+  padding-top: 60px;
+}
+
+// Set the correct sprite paths
+@iconSpritePath: ('../assets/glyphicons-halflings.png');
+@iconWhiteSpritePath: ('../assets/glyphicons-halflings-white.png');
+
+// Your custom LESS stylesheets goes here
+//
+// Since bootstrap was imported above you have access to its mixins which
+// you may use and inherit here
+//
+// If you'd like to override bootstrap's own variables, you can do so here as well
+// See http://twitter.github.com/bootstrap/less.html for their names and documentation
+//
+// Example:
+// @linkColor: #ff0000;
+
+strong, th {
+	font-family: 'proxima-bold', arial, sans-serif;
+	font-weight: normal;
+}
+legend, .form-actions {
+  border: 0;
+	background-color: transparent;
+}
+
+.icon-globe {
+  background-position: -336px -144px;
+}
+
+.icon-hand-up {
+	background-position: -192px -144px;
+}
+.icon-hand-right {
+background-position: -144px -144px;
+}
+.icon-clip-board {
+	background: url(../assets/clip_board_12.png) no-repeat;
+}
+/* Checkbox label alignment on right fix */
+label.checkbox {
+	text-align: left !important;
+}
+input[type=checkbox] {
+	margin-right: 10px !important;
+}

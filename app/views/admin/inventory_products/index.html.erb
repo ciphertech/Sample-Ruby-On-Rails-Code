@@ -1,0 +1,9 @@
+<div class="header_bar">
+  <h2><%=pp_action%></h2>
+</div>
+<div class="main_content">
+  
+  <%= link_to 'Pull from Inventory Items', [ :pull_items, :admin, :inventory_products], :class => 'btn btn-alt' %>
+  
+  <%=render :partial=>"admin/shared/collection_table"%>
+</div>

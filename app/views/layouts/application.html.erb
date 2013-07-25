@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<script type="text/javascript">
+  	if (window != top){ 
+  		parent.$.fn.colorbox.close(); 
+  		<% if current_controller? 'manager/vendors' || 'manager/locations' || 'manager/categories' %> 
+        parent.location.reload(); 
+      <% end %> 
+  	}
+	</script>
+
+  <title><%= yield(:title) || "CipherTech" %></title>
+  <%= stylesheet_link_tag "manager", :media => "all" %>
+  <% if request.fullpath.include?("admin") %>
+    <%= javascript_include_tag "manager", "admin" %>
+  <% else %>
+    <%= javascript_include_tag "manager" %>
+  <% end %>
+	<%= javascript_include_tag "select2.min.js" %>
+  <%= javascript_include_tag "/colorbox/jquery.colorbox-min.js" %>
+  <%= javascript_include_tag "/nicescroll/jquery.nicescroll.min.js" %>
+  <%= stylesheet_link_tag "/colorbox/colorbox.css" %>
+  <%= stylesheet_link_tag 'gmaps4rails' %>
+	<%= stylesheet_link_tag 'select2.css' %>
+  <%= csrf_meta_tags %>
+  <%= stylesheet_link_tag "main", :media => "all" %>
+	<%= stylesheet_link_tag 'less-responsive' %>
+	
+  <% if user_signed_in? %>
+    <script type="text/javascript">
+      var units      = <%= Unit.find(:all,:select=>"id, name").to_json.html_safe %>;
+      var locations  = <%= current_restaurant.locations.find(:all,:select=>"id, name").to_json.html_safe %>;
+      var categories = <%= Category.find(:all,:select=>"id, name").to_json.html_safe %>;
+      var vendors    = <%= Vendor.select("id, name").global_and_local_for_restaraunt(current_restaurant).order("name").to_json.html_safe %>;
+    </script>
+  <% end %>
+
+  <!--[if IE]>
+  <script type="text/javascript" src="/js/PIE.js"></script>
+  <script type="text/javascript" src="/js/pie-config.js"></script>
+  <![endif]-->
+
+  <!--[if (gte IE 5)&(lte IE 9)]>
+  <script type="text/javascript" src="/js/selectivizr-min.js"></script>
+  <link href="/assets/ie.css" media="all" rel="stylesheet" type="text/css" />
+
+  <![endif]-->
+
+</head>
+<body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar">
+    <div class="n navbar-inner-top">
+      <div class="container">
+        <a class="brand" href="/admin/system">CipherTech beta</a>
+        <div class="nav-collapse">
+
+            <ul class="nav">
+              <% navigation_items.each do |item| %>
+                <li><%= link_to item[:title], item[:path] %></li>
+              <%end%>
+            </ul>
+
+          <ul class="nav pull-right">
+
+            <% if user_signed_in? %>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= current_user.name %> <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/manager/account/<%= current_user.id %>" class="single">My Account</a></li>
+                  <li class="divider"></li>
+                  <li><%= link_to("Sign Out", destroy_user_session_path, :method => :delete) %></li>
+                </ul>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= current_restaurant.name %> <% if current_user.restaurants.length > 1 %><b class="caret"></b><% end %></a>
+                <% if current_user.restaurants.length > 1 %><ul class="dropdown-menu">
+                  <% current_user.restaurants.delete_if{ |r| r.id == current_restaurant.id }.each do |restaurant| %>
+                  <li><%= link_to(restaurant.name, [:switch, :manager, restaurant]) %></li>
+                  <% end %>
+                </ul><% end %>
+              </li>
+
+            <% else %>
+
+              <li>
+                <div id="login_bar">
+                  <%= simple_form_for(:user, :url => new_user_session_path) do |f| %>
+									<input name='local_tz' type ='hidden' class='tz' />
+                    <ul>
+                      <li><%= f.input :email, :label => false, :required => false, :autofocus => true, :placeholder => 'email' %></li>
+                      <li><%= f.input :password, :label => false, :required => false, :placeholder => 'password' %></li>
+                      <li><%= f.button :submit, "Sign in", :class => 'btn-alt btn-small' %></li>
+											<li><%= link_to "Password Lost?", new_user_password_path, :class => 'btn btn-inverse btn-small' %></li>
+											<li><%= link_to 'Sign Up', new_user_registration_path, :class => 'btn btn-alt btn-small' %></li>
+                    </ul>
+                  <% end %>
+                </div>
+                
+                </li>
+
+            <% end %>
+
+            <% if super_admin? %>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">ADMIN ONLY<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><%= link_to("Home", "/admin/system" )%></li>
+
+                  <% admin_items.each do |item| %>
+                    <% css_class = controller_name_with_module == "#{item[:path][0]}/#{item[:path][1]}" ? "current" : ""%>
+                    <li class="<%= css_class -%>"><%= link_to content_tag(:span, item[:title]), item[:path]%></li>
+                  <% end %>
+                </ul>
+              </li>
+            <% end %>
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- navbar -->
+
+  <div class="container">
+
+    <div class="subnav">
+      <div id="masthead">
+        <%= link_to '<h1>CipherTech beta</h1>'.html_safe, (user_signed_in? ? manager_restaurants_path : root_path), :title => 'CipherTech beta', :id => 'logo' %>
+
+        <div id="nav">
+          <ul>
+            <% navigation_items.each do |item| %>
+              <% css_class = (current_controller?(item[:path]) || controller_name_with_module == "#{item[:path][1]}/#{item[:path][2]}" || controller_name_with_module == "#{item[:path][0]}/#{item[:path][1]}") ? "current" : ""
+                if item[:title] == "Settings"
+                  subnav_items.each do |item| 
+                    if controller_name_with_module == "#{item[:path][0]}/#{item[:path][1]}"
+                      css_class = "current"
+                    end
+                  end
+                end %>
+                <li class="<%=css_class-%>"><%= link_to content_tag(:span, item[:title]), item[:path]%></li>
+            <% end %>
+						<% if user_signed_in? %>
+						<li>
+							<div class="sub">
+							<%= link_to("<div class='badge badge-success smaller'><i class='shop-icon'></i>Search for products with a better price</div>".html_safe, [:manager, :products]) %>
+							</div>
+            </li>
+						<% end %>
+          </ul>
+        </div>
+
+      </div>
+      <div class="clearboth"></div>
+    </div>
+
+    <div class="content_body<% case controller_name_with_module 
+															 when 'pages',
+																		'registrations',
+																		'devise/sessions',
+																		'devise/passwords',
+																		'devise/invitations',
+																		'devise/confirmations',
+																		'devise/unlocks' 
+															%> public<% end%>">
+      <% flash.each do |name, msg| %>
+        <div class="alert <%= name %>">
+          <a class="close" data-dismiss="alert">×</a>
+          <%= msg %>
+        </div>
+      <% end %>
+      <div class="content_inner">
+        <div class="clearboth"></div>
+        <%= yield %>
+      </div></div>
+      
+    </div>
+
+  </div><!-- container -->
+
+  <%=render :partial=>"layouts/shared/footer2"%>
+	<%=render :partial => 'layouts/shared/google_analytics' if Rails.env == 'production' %>
+	<div id="modal-confirm" class="modal fade">
+	  <div class="modal-body">
+	    <h3></h3>
+	  </div>
+	  <div class="modal-footer">
+	    <a id="modal-accept" href="#" class="btn">OK</a>
+	    <a id="modal-cancel" href="#" class="btn btn-danger">Cancel</a>
+	  </div>
+	</div>
+</body>
+</html>
+

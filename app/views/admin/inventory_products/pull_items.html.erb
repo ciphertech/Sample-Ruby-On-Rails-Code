@@ -1,0 +1,26 @@
+<div class="header_bar">
+  <h2><%=pp_action%></h2>
+</div>
+<div class="main_content">
+  <%= link_to 'Pull from Inventory Items (again)', [ :pull_items, :admin, :inventory_products], :class => 'btn btn-alt' %>
+  <%= link_to 'List Inventory Items', [ :admin, :inventory_products], :class => 'btn btn-alt' %>
+
+  <table>
+  <tr>
+    <td>Restaurant</th>
+    <th>Name</th>
+    <td>Category</th>
+    <td>Inventory Items</td>
+    <td>Inventory Product</td>
+  </tr>
+  <% @out.each do |item, product| %>
+    <tr>
+      <td><%=item.restaurant_id%></td>
+      <td><%=item.name%></td>
+      <td><%=item.category_id%></td>
+      <td><%=item["ids"].gsub(/,/,", ")%></td>
+      <td><%=product.id%></td>
+    </tr>
+  <%end%>
+  </table>
+</div>

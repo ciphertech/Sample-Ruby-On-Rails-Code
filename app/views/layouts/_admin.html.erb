@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= yield(:title) || "CipherTech" %></title>
+  <%= stylesheet_link_tag "manager", :media => "all" %>
+  <%= javascript_include_tag "manager" %>
+  <%= javascript_include_tag "/colorbox/jquery.colorbox-min.js" %>
+  <%#= javascript_include_tag "/nicescroll/jquery.nicescroll.min.js" %>
+  <%= stylesheet_link_tag "/colorbox/colorbox.css" %>
+  <%#= stylesheet_link_tag 'gmaps4rails' %>
+  <%= csrf_meta_tags %>
+  <%= stylesheet_link_tag "main", :media => "all" %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript">
+  </script>
+</head>
+<body data-spy="scroll" data-target=".subnav" data-offset="50">
+  <div class="navbar">
+    <div class="n navbar-inner-top">
+      <div class="container">
+        <a class="brand" href="/admin/system">CipherTech</a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <% navigation_items.each do |item| %>
+              <li><%= link_to item[:title], item[:path] %></li>
+            <%end%>
+          </ul>
+          <ul class="nav pull-right">
+            
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= current_user.name %> <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/manager/account/<%=current_user.id%>" class="single">My Account</a></li>
+                <li class="divider"></li>
+                <li><%= link_to("Log Out", manager_logout_path) %></li>
+              </ul>
+            </li>
+            
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">ADMIN ONLY<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                
+                <li><%= link_to("Home", "/" )%></li>
+                
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div> 
+  
+  <div class="container">
+  <div class="subnav subnav-fixed">
+  <div id="masthead">
+  
+  <a id="logo" href="/admin/system" title="CipherTech"><h1>CipherTech</h1></a>
+  
+  <div id="nav"> 
+    <ul>
+      <% admin_items.each do |item| %>
+         <% css_class = controller_name_with_module == "#{item[:path][0]}/#{item[:path][1]}" ? "current" : ""%>
+         <li class="<%=css_class-%>">
+          <%= link_to content_tag(:span, item[:title]), item[:path]%></li>
+        </li>
+      <%end%>
+    </ul>
+  </div><!--/nav-->
+  </div>
+  <div class="clearboth"></div>
+
+</div>
+  <div class="content_body"><div class="row">
+      <div class="span12">
+        <% flash.each do |name, msg| %>
+          <div class="alert alert-<%= name == :notice ? "success" : "error" %>">
+            <a class="close" data-dismiss="alert">×</a>
+            <%= msg %>
+          </div>
+        <% end %>
+        <%= yield %>
+        <div class="clearboth"></div>
+        <br/>
+      </div></div>
+    </div></div>
+  </div>
+      
+<%=render :partial=>"layouts/shared/footer2"%>
+
+</body>
+</html>
